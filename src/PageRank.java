@@ -49,18 +49,54 @@ public class PageRank {
         //TODO 1: Compute stochastic matrix M
         double[][] M = new double[10][10];
 
-        //number of outgoing links
-        int[] c = new int[10];
+        for (int i = 0; i < 10; i++) {
+            int c = 0;
 
-        return L;
+            for (int j = 0; j < 10; j++) {
+                if (L[i][j] == 1) {
+                    c++;
+                }
+            }
+
+            for (int j = 0; j < 10; j++) {
+                if (L[i][j] == 1) {
+                    M[i][j] = 1.0 / c;
+                } else {
+                    M[i][j] = 0;
+                }
+            }
+        }
+
+        return M;
     }
 
 
     private double[] pageRank(double q) {
         //TODO 2: compute PageRank with damping factor q (method parameter, by default q value from class constant)
         //return array of PageRank values (indexes: page number - 1, e.g. result[0] = TrustRank of page 1).
+//  𝑃𝑎𝑔𝑒𝑅𝑎𝑛𝑘(𝑑𝑖
+//) = 𝑣𝑖 = 𝑞 + (1 − 𝑞) ∑𝑣𝑗/𝑐𝑗
 
-        return new double[0];
+        double[] data = new double[10];
+
+        for (int i = 0; i < 10; i++) {
+            int c = 0;
+            double vj = 0.0;
+
+            for (int j = 0; j < 10; j++) {
+                if (M[i][j] < 0) {
+                    c++;
+                }
+                vj += M[i][j];
+            }
+
+            double vi = q + (1 - q) * (vj / c);
+            data[i] = vi;
+        }
+
+        System.err.println(q);
+
+        return data;
     }
 
     private double[] trustRank(double q) {
