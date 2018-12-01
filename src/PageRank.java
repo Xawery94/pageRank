@@ -1,6 +1,7 @@
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class PageRank {
     private static int ITERATIONS = 100;
@@ -26,8 +27,8 @@ public class PageRank {
         L[8] = new double[]{0, 0, 0, 0, 0, 0, 1, 0, 0, 1};
         L[9] = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        System.out.println("Matrix L (indices)");
-        printMatrix(L);
+//        System.out.println("Matrix L (indices)");
+//        printMatrix(L);
 
         M = getM(L);
         System.out.println("Matrix M (indices)");
@@ -37,7 +38,7 @@ public class PageRank {
         double[] pr = pageRank(q);
         sortAndPrint(pr);
 
-        System.out.println("TRUSTRANK (DOCUMENTS 1 AND 2 ARE GOOD)");
+//        System.out.println("TRUSTRANK (DOCUMENTS 1 AND 2 ARE GOOD)");
         L[0][4] = 0;
         L[2][6] = 0;
         M = getM(L);
@@ -45,24 +46,30 @@ public class PageRank {
         sortAndPrint(trustRank(q));
     }
 
+    private int[] c = new int[10];
+
     private double[][] getM(double[][] L) {
         //TODO 1: Compute stochastic matrix M
         double[][] M = new double[10][10];
+        //number of outgoing links
+//        int[] c = new int[10];
 
-        for (int i = 0; i < 10; i++) {
-            int c = 0;
-
-            for (int j = 0; j < 10; j++) {
-                if (L[i][j] == 1) {
-                    c++;
-                }
+        int i = 0;
+        while (i < M.length) {
+            int j = 0;
+            while (j < 10) {
+                c[i] += L[i][j];
+                j++;
             }
+            i++;
+        }
 
+        for (int x = 0; x < M.length; x++) {
             for (int j = 0; j < 10; j++) {
-                if (L[i][j] == 1) {
-                    M[i][j] = 1.0 / c;
+                if (L[x][j] == 1) {
+                    M[j][x] = 1.0 / c[x];
                 } else {
-                    M[i][j] = 0;
+                    M[j][x] = 0;
                 }
             }
         }
@@ -70,31 +77,30 @@ public class PageRank {
         return M;
     }
 
-
     private double[] pageRank(double q) {
         //TODO 2: compute PageRank with damping factor q (method parameter, by default q value from class constant)
         //return array of PageRank values (indexes: page number - 1, e.g. result[0] = TrustRank of page 1).
-//  𝑃𝑎𝑔𝑒𝑅𝑎𝑛𝑘(𝑑𝑖
-//) = 𝑣𝑖 = 𝑞 + (1 − 𝑞) ∑𝑣𝑗/𝑐𝑗
+        // 𝑣𝑖 = 𝑞 + (1 − 𝑞) ∑𝑣𝑗/𝑐𝑗
 
         double[] data = new double[10];
 
-        for (int i = 0; i < 10; i++) {
-            int c = 0;
-            double vj = 0.0;
-
-            for (int j = 0; j < 10; j++) {
-                if (M[i][j] < 0) {
-                    c++;
-                }
-                vj += M[i][j];
-            }
-
-            double vi = q + (1 - q) * (vj / c);
-            data[i] = vi;
+        for (int i = 0; i < data.length; i++) {
+            data[i] = 0.1;
         }
 
-        System.err.println(q);
+        for (int k = 0; k < ITERATIONS; k++) {
+            for (int i = 0; i < data.length; i++) {
+                for (int j = 0; j < data.length; j++) {
+                    data[i] += M[i][j] * data[j];
+                }
+
+                data[i] = q + ((1 - q) * (data[i]));
+            }
+        }
+
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i] / IntStream.of(c).sum();
+        }
 
         return data;
     }
