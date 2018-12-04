@@ -7,6 +7,7 @@ public class PageRank {
     private static int ITERATIONS = 100;
     private static double q = 0.15;
     private double[][] M;
+    private int[] c = new int[10];
 
     public static void main(String[] args) {
         PageRank pageRank = new PageRank();
@@ -46,13 +47,9 @@ public class PageRank {
         sortAndPrint(trustRank(q));
     }
 
-    private int[] c = new int[10];
-
     private double[][] getM(double[][] L) {
         //TODO 1: Compute stochastic matrix M
         double[][] M = new double[10][10];
-        //number of outgoing links
-//        int[] c = new int[10];
 
         int i = 0;
         while (i < M.length) {
@@ -85,7 +82,7 @@ public class PageRank {
         double[] data = new double[10];
 
         for (int i = 0; i < data.length; i++) {
-            data[i] = 0.1;
+            data[i] = 1 / (double) data.length;
         }
 
         for (int k = 0; k < ITERATIONS; k++) {
@@ -98,11 +95,20 @@ public class PageRank {
             }
         }
 
+        double sum = sum(data);
+
         for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] / IntStream.of(c).sum();
+            data[i] = data[i] / sum;
         }
 
         return data;
+    }
+
+    private double sum(double... values) {
+        double result = 0;
+        for (double value:values)
+            result += value;
+        return result;
     }
 
     private double[] trustRank(double q) {
