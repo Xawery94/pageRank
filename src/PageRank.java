@@ -93,12 +93,13 @@ public class PageRank {
 
                 data[i] = q + ((1 - q) * (data[i]));
             }
-        }
 
-        double sum = sum(data);
+            double sum = sum(data);
 
-        for (int i = 0; i < data.length; i++) {
-            data[i] = data[i] / sum;
+            for (int i = 0; i < data.length; i++) {
+                data[i] = data[i] / sum;
+            }
+
         }
 
         return data;
