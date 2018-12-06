@@ -7,7 +7,6 @@ public class PageRank {
     private static int ITERATIONS = 100;
     private static double q = 0.15;
     private double[][] M;
-    private int[] c = new int[10];
 
     public static void main(String[] args) {
         PageRank pageRank = new PageRank();
@@ -50,18 +49,22 @@ public class PageRank {
     private double[][] getM(double[][] L) {
         //TODO 1: Compute stochastic matrix M
         double[][] M = new double[10][10];
+        int[] c = new int[10];
 
         int i = 0;
         while (i < M.length) {
             int j = 0;
-            while (j < 10) {
-                c[i] += L[i][j];
-                j++;
+            if (j < 10) {
+                do {
+                    c[i] = (int) (c[i] + L[i][j]);
+                    j++;
+                } while (j < 10);
             }
             i++;
         }
 
-        for (int x = 0; x < M.length; x++) {
+        int x = 0;
+        while (x < M.length) {
             for (int j = 0; j < 10; j++) {
                 if (L[x][j] == 1) {
                     M[j][x] = 1.0 / c[x];
@@ -69,6 +72,7 @@ public class PageRank {
                     M[j][x] = 0;
                 }
             }
+            x++;
         }
 
         return M;
@@ -77,29 +81,30 @@ public class PageRank {
     private double[] pageRank(double q) {
         //TODO 2: compute PageRank with damping factor q (method parameter, by default q value from class constant)
         //return array of PageRank values (indexes: page number - 1, e.g. result[0] = TrustRank of page 1).
-        // 𝑣𝑖 = 𝑞 + (1 − 𝑞) ∑𝑣𝑗/𝑐𝑗
 
         double[] data = new double[10];
 
-        for (int i = 0; i < data.length; i++) {
-            data[i] = 1 / (double) data.length;
-        }
+        IntStream.range(0, data.length).forEach(i -> data[i] = 1 / (double) data.length);
 
-        for (int k = 0; k < ITERATIONS; k++) {
-            for (int i = 0; i < data.length; i++) {
-                for (int j = 0; j < data.length; j++) {
-                    data[i] += M[i][j] * data[j];
+        int k = 0;
+        while (k < ITERATIONS) {
+            int i = 0;
+            while (i < data.length) {
+                int j = 0;
+                while (j < data.length) {
+                    data[i] = data[i] + (M[i][j] * data[j]);
+                    j++;
                 }
 
                 data[i] = q + ((1 - q) * (data[i]));
+                i++;
             }
 
             double sum = sum(data);
 
-            for (int i = 0; i < data.length; i++) {
-                data[i] = data[i] / sum;
-            }
+            IntStream.range(0, data.length).forEach(x -> data[x] = data[x] / sum);
 
+            k++;
         }
 
         return data;
@@ -107,8 +112,10 @@ public class PageRank {
 
     private double sum(double... values) {
         double result = 0;
-        for (double value:values)
+        for (int i = 0, valuesLength = values.length; i < valuesLength; i++) {
+            double value = values[i];
             result += value;
+        }
         return result;
     }
 
