@@ -32,7 +32,7 @@ public class PageRank {
 
         M = getM(L);
         System.out.println("Matrix M (indices)");
-        printMatrix(M);
+//        printMatrix(M);
 
         System.out.println("PAGERANK");
         double[] pr = pageRank(q);
@@ -83,6 +83,7 @@ public class PageRank {
         //return array of PageRank values (indexes: page number - 1, e.g. result[0] = TrustRank of page 1).
 
         double[] data = new double[10];
+        double[] temp = new double[10];
 
         IntStream.range(0, data.length).forEach(i -> data[i] = 1 / (double) data.length);
 
@@ -96,16 +97,16 @@ public class PageRank {
                     j++;
                 }
 
-                data[i] = q + ((1 - q) * (data[i]));
+                temp[i] = q + ((1 - q) * (data[i]));
                 i++;
             }
 
-            double sum = sum(data);
-
-            IntStream.range(0, data.length).forEach(x -> data[x] = data[x] / sum);
-
+            double sum = sum(temp);
+            IntStream.range(0, data.length).forEach(x -> data[x] = temp[x] / sum);
             k++;
         }
+
+        System.err.println(sum(data));
 
         return data;
     }
