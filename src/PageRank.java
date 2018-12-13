@@ -93,11 +93,11 @@ public class PageRank {
             while (i < data.length) {
                 int j = 0;
                 while (j < data.length) {
-                    data[i] = data[i] + (M[i][j] * data[j]);
+                    temp[i] = temp[i] + (M[i][j] * data[j]);
                     j++;
                 }
 
-                temp[i] = q + ((1 - q) * (data[i]));
+                temp[i] = q + ((1 - q) * (temp[i]));
                 i++;
             }
 
